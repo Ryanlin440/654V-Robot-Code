@@ -7,13 +7,15 @@ Assembly::Assembly(
     mik::motor_group lift_arm_motors,
     mik::motor intake_motor, 
     vex::rotation lift_arm_encoder,
-    mik::piston long_piston
+    mik::piston long_piston,
+    mik::piston scraper_piston
 ) :
     // Assign the ports to the devices
     lift_arm_motors(lift_arm_motors),
     intake_motor(intake_motor),
     lift_arm_encoder(lift_arm_encoder),
-    long_piston(long_piston) // Make sure when using a 3 wire device that isnt mik::piston you convert the port. `to_triport(PORT_A)`.
+    long_piston(long_piston), // Make sure when using a 3 wire device that isnt mik::piston you convert the port. `to_triport(PORT_A)`.
+    scraper_piston(scraper_piston)
 {};
 
 // You want to call this function once in the user control function in main.
@@ -31,6 +33,7 @@ void Assembly::control() {
     lift_arm_control();
     intake_motors_control();
     long_piston_control();
+    scraper_piston_control();
 }
 
 void Assembly::move_lift_arm() {
@@ -81,5 +84,11 @@ void Assembly::intake_motors_control() {
 void Assembly::long_piston_control() {
     if (btnA_new_press(Controller.ButtonA.pressing())) {
         long_piston.toggle();
+    }
+}
+
+void Assembly::scraper_piston_control(){
+    if(btnB_new_press(Controller.ButtonB.pressing())){
+        scraper_piston.toggle();
     }
 }

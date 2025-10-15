@@ -12,7 +12,8 @@ public:
         mik::motor_group lift_arm_motors,
         mik::motor intake_motor, 
         vex::rotation lift_arm_encoder,
-        mik::piston long_piston
+        mik::piston long_piston,
+        mik::piston scraper_piston
     );
     
     void init();
@@ -22,6 +23,7 @@ public:
     void lift_arm_control();
     void intake_motors_control();
     void long_piston_control();
+    void scraper_piston_control();
 
     int lift_arm_position = IDLE;
     vex::task lift_task;
@@ -30,4 +32,5 @@ public:
     mik::motor intake_motor;
     vex::rotation lift_arm_encoder;
     mik::piston long_piston;
+    mik::piston scraper_piston;
 };

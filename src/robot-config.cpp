@@ -56,7 +56,8 @@ Assembly assembly(
 
 	mik::motor(PORT16, false, blue_6_1, "intake_motor"),
 	vex::rotation(PORT11),
-	mik::piston(PORT_A)
+	mik::piston(PORT_A),
+	mik::piston(PORT_B)
 );
 
 /** Allows UI to display all motor values */
