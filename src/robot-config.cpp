@@ -21,14 +21,14 @@ static const float MINIMUN_INERTIAL_CALIBRATION_ERROR = .05;
 Chassis chassis(
     // Drivetrain motors
     mik::motor_group({
-		mik::motor(PORT4, false, blue_6_1, "left_front_motor"), 
-		mik::motor(PORT8, false, blue_6_1, "left_middle_motor"), 
-		mik::motor(PORT6, false, blue_6_1, "left_back_motor")
+		mik::motor(PORT18, true, blue_6_1, "left_front_motor"), 
+		mik::motor(PORT17, true, blue_6_1, "left_middle_motor"), 
+		mik::motor(PORT16, true, blue_6_1, "left_back_motor")
     }),
     mik::motor_group({
-		mik::motor(PORT5, false, blue_6_1, "right_front_motor"), 
-		mik::motor(PORT9, false, blue_6_1, "right_middle_motor"), 
-		mik::motor(PORT10, false, blue_6_1, "right_back_motor")
+		mik::motor(PORT12, false, blue_6_1, "right_front_motor"), 
+		mik::motor(PORT13, false, blue_6_1, "right_middle_motor"), 
+		mik::motor(PORT14, false, blue_6_1, "right_back_motor")
     }),
 
     PORT18, // Inertia sensor port
@@ -50,14 +50,17 @@ Chassis chassis(
 
 Assembly assembly(
 	mik::motor_group({
-		mik::motor(PORT13, true, green_18_1, "left_lift_motor"),
-		mik::motor(PORT20, false, green_18_1, "right_lift_motor")
+		mik::motor(PORT8, false, green_18_1, "left_lift_motor"),
+		mik::motor(PORT10, true, green_18_1, "right_lift_motor")
 	}),
 
-	mik::motor(PORT16, false, blue_6_1, "intake_motor"),
-	vex::rotation(PORT11),
-	mik::piston(PORT_A),
-	mik::piston(PORT_B)
+	mik::motor(PORT20, false, blue_6_1, "intake_motor1"),
+	vex::rotation(PORT1),
+	mik::piston(PORT_C),//goal changing eventually
+	mik::piston(PORT_B),//scraper piston
+	mik::motor(PORT5, true, blue_6_1, "intake_motor2"),
+	mik::piston(PORT_A)//park changing piston
+
 );
 
 /** Allows UI to display all motor values */
@@ -66,11 +69,12 @@ void log_motors() {
 		// Add all mik motor groups in here
 		chassis.left_drive, 
 		chassis.right_drive, 
-		// assembly.lift_arm_motors
+		assembly.lift_arm_motors
     }, 
 	{
 		// Add all mik motors in here
-		assembly.intake_motor
+		assembly.intake_motor1,
+		assembly.intake_motor2
     }
   );
 }
@@ -189,5 +193,4 @@ void enable_user_control(void) {
 }
 
 bool control_disabled(void) {
-  	return user_control_disabled;
-}
+  	return user_control_dis
