@@ -5,23 +5,23 @@ bool goalBool = false;
 // Pass in the devices we want to use
 Assembly::Assembly(
     mik::motor_group lift_arm_motors,
-    mik::motor intake_motor1, 
+    mik::motor intake_motor_front, 
     vex::rotation lift_arm_encoder,
-    mik::piston long_piston,
+    mik::piston goal_change,
     mik::piston scraper_piston,
     mik::motor intake_motor2,
-    mik::piston goal_piston
+    mik::piston park_change
 
 
 ) :
     // Assign the ports to the devices
     lift_arm_motors(lift_arm_motors),
-    intake_motor1(intake_motor1),
+    intake_motor_front(intake_motor_front),
     lift_arm_encoder(lift_arm_encoder),
-    long_piston(long_piston), // Make sure when using a 3 wire device that isnt mik::piston you convert the port. `to_triport(PORT_A)`. goal
+    goal_change(goal_change), // Make sure when using a 3 wire device that isnt mik::piston you convert the port. `to_triport(PORT_A)`. goal
     scraper_piston(scraper_piston),
     intake_motor2(intake_motor2),
-    goal_piston(goal_piston) //park for now changing
+    park_change(park_change) //park for now changing
 
 {};
 
@@ -39,9 +39,9 @@ void Assembly::init() {
 void Assembly::control() {
     lift_arm_control();
     intake_motors_control();
-    long_piston_control();
+    goal_change_control();
     scraper_piston_control();
-    goal_piston_control();
+    park_change_control();
 }
 
 void Assembly::move_lift_arm() {
@@ -59,66 +59,62 @@ void Assembly::move_lift_arm() {
 
 void Assembly::lift_arm_control() {
     // new_press macro only allows input to go through when button is pressed. Resets after button is released.
-    if (btnX_new_press(Controller.ButtonX.pressing())) {
-        // If Up arrow is pressed it will swap lift positions between scoring and loading
-        if (lift_arm_position != SCORING) {
-            lift_arm_position = SCORING; // Lift task will read this value
-        } else {
-            lift_arm_position = LOADING;
-        }
-    } else if (btnUp_new_press(Controller.ButtonUp.pressing())) {
-        // If Up arrow is pressed it will swap lift positions between loading and idle
-        if (lift_arm_position != LOADING) {
-            lift_arm_position = LOADING;
-        } else {
-            lift_arm_position = IDLE;
-        }
-    }
+    // if (btnX_new_press(Controller.ButtonX.pressing())) {
+    //     // If Up arrow is pressed it will swap lift positions between scoring and loading
+    //     if (lift_arm_position != SCORING) {
+    //         lift_arm_position = SCORING; // Lift task will read this value
+    //     } else {
+    //         lift_arm_position = LOADING;
+    //     }
+    // } else if (btnUp_new_press(Controller.ButtonUp.pressing())) {
+    //     // If Up arrow is pressed it will swap lift positions between loading and idle
+    //     if (lift_arm_position != LOADING) {
+    //         lift_arm_position = LOADING;
+    //     } else {
+    //         lift_arm_position = IDLE;
+    //     }
+    // }
 }
 
 // Spins intake forward if L1 is being held, reverse if L2 is being held; stops otherwise
 void Assembly::intake_motors_control() {
-    if(Controller.ButtonUp.pressing()){
+    if(btnUp_new_press(Controller.ButtonUp.pressing())){
         goalBool = !goalBool;
-        wait(.5, seconds);
     }
-    if (Controller.ButtonL1.pressing()) {
-        // intake_motor1.spin(fwd, 12, volt);
+    if (Controller.ButtonR2.pressing()) {
+        // intake_motor_front.spin(fwd, 12, volt);
         if(goalBool){
-            intake_motor1.spin(fwd, 12, volt);
+            intake_motor_front.spin(fwd, 12, volt);
         }
         
         lift_arm_motors.spin(fwd, 12, volt);
 
-    } else if (Controller.ButtonL2.pressing()) {
-        // intake_motor1.spin(fwd, -12, volt);
+    } else if (Controller.ButtonR1.pressing()) {
+        // intake_motor_front.spin(fwd, -12, volt);
         if(goalBool){
-            intake_motor1.spin(fwd, 12, volt);//wtfffffffff
+            intake_motor_front.spin(fwd, -12, volt);//wtfffffffff
         }
         lift_arm_motors.spin(fwd, -12, volt);
     } else {
-        intake_motor1.stop();
+        intake_motor_front.stop();
         intake_motor2.stop();
         lift_arm_motors.stop();
     }
+    if (Controller.ButtonL2.pressing()) {
+        lift_arm_motors.spin(fwd, 2, volt);
+    } else if (Controller.ButtonL1.pressing()) {
+        lift_arm_motors.spin(fwd, -2, volt);
+    } 
 }
 
 
 // Extends or retracts piston when button A is pressed, can only extend or retract again until button A is released and pressed again
-void Assembly::long_piston_control() {//port c or goal
+void Assembly::goal_change_control() {//port c or goal
     if (btnA_new_press(Controller.ButtonA.pressing())) {
-        long_piston.toggle();
+        goal_change.toggle();
     }
 }
 
 void Assembly::scraper_piston_control(){// port b
     if(btnB_new_press(Controller.ButtonB.pressing())){
-        scraper_piston.toggle();
-    }
-}
-
-void Assembly::goal_piston_control(){//port a park for now
-    if(btnX_new_press(Controller.ButtonX.pressing())){
-        goal_piston.toggle();
-    }
-}
+        scraper_p

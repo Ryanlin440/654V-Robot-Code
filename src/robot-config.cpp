@@ -54,7 +54,7 @@ Assembly assembly(
 		mik::motor(PORT10, true, green_18_1, "right_lift_motor")
 	}),
 
-	mik::motor(PORT20, false, blue_6_1, "intake_motor1"),
+	mik::motor(PORT20, false, blue_6_1, "intake_motor_front"),
 	vex::rotation(PORT1),
 	mik::piston(PORT_C),//goal changing eventually
 	mik::piston(PORT_B),//scraper piston
@@ -73,7 +73,7 @@ void log_motors() {
     }, 
 	{
 		// Add all mik motors in here
-		assembly.intake_motor1,
+		assembly.intake_motor_front,
 		assembly.intake_motor2
     }
   );
@@ -193,4 +193,5 @@ void enable_user_control(void) {
 }
 
 bool control_disabled(void) {
-  	return user_control_dis
+  	return user_control_disabled;
+}
