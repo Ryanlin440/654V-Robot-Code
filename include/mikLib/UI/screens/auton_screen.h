@@ -3,6 +3,7 @@
 #include "vex.h"
 
 // Absolute garbage code, a full rewrite needs to be done
+// bool red_blue = false;
 
 namespace mik {
 

@@ -49,17 +49,17 @@ Chassis chassis(
 );
 
 Assembly assembly(
-	mik::motor_group({
-		mik::motor(PORT8, false, green_18_1, "left_lift_motor"),
-		mik::motor(PORT10, true, green_18_1, "right_lift_motor")
-	}),
+	mik::motor_group({mik::motor(PORT8, false, green_18_1, "left_lift_motor"),
+					  mik::motor(PORT10, true, green_18_1, "right_lift_motor")}),
 
 	mik::motor(PORT20, false, blue_6_1, "intake_motor_front"),
 	vex::rotation(PORT1),
-	mik::piston(PORT_C),//goal changing eventually
-	mik::piston(PORT_B),//scraper piston
-	mik::motor(PORT5, true, blue_6_1, "intake_motor2"),
-	mik::piston(PORT_A)//park changing piston
+	mik::piston(PORT_C), // goal changing eventually
+	mik::piston(PORT_B), // scraper piston
+	mik::motor_group({mik::motor(PORT11, false, blue_6_1, "left_lift_motor")}),
+	mik::piston(PORT_A), // park changing piston
+	vex::optical(PORT9),
+	vex::optical(PORT2)
 
 );
 
@@ -69,12 +69,13 @@ void log_motors() {
 		// Add all mik motor groups in here
 		chassis.left_drive, 
 		chassis.right_drive, 
-		assembly.lift_arm_motors
+		assembly.lift_arm_motors,
+		assembly.colorMotor
     }, 
 	{
 		// Add all mik motors in here
 		assembly.intake_motor_front,
-		assembly.intake_motor2
+		
     }
   );
 }
@@ -176,6 +177,7 @@ void init(void) {
 
 	// Make sure user control is enabled
 	enable_user_control();
+
 }
 
 static bool user_control_disabled = false;

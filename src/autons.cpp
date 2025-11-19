@@ -49,8 +49,8 @@ std::string template_auto(bool calibrate, auto_variation var, bool get_name) {
     }
     
     /* We now run the auto */ 
-    chassis.drive_distance(10);
-    chassis.drive_distance(-10);
+    chassis.drive_distance(1);
+    chassis.drive_distance(-1);
 
     return "";
 }
@@ -79,6 +79,8 @@ std::string blue_left_winpoint(bool calibrate, auto_variation var, bool get_name
 
         return "";
     }
+    chassis.drive_distance(2);
+    chassis.turn_to_angle(180);
 
     return "";
 }

@@ -360,7 +360,7 @@ void UI_auton_screen::UI_select_auton(autons auton) {
         off_skills = !off_skills;
         break;
     }
-
+    
     if (off_sawp && quals_elims) {
         for (const auto& component : UI_auton_scr->get_UI_components()) {
             if (off_sawp_ID == component->get_ID()) {

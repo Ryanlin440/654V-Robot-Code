@@ -14,8 +14,11 @@ public:
         vex::rotation lift_arm_encoder,
         mik::piston goal_change,
         mik::piston scraper_piston,
-        mik::motor intake_motor2,
-        mik::piston park_change
+        mik::motor_group colorMotor,
+        mik::piston park_change,
+        vex::optical colorSensor,
+        vex::optical topSensor
+
 
     );
     
@@ -28,6 +31,7 @@ public:
     void goal_change_control();
     void scraper_piston_control();
     void park_change_control();
+    void colorCode();
     // void switchIntake();
 
     int lift_arm_position = IDLE;
@@ -38,8 +42,9 @@ public:
     vex::rotation lift_arm_encoder;
     mik::piston goal_change;
     mik::piston scraper_piston;
-    mik::motor intake_motor2;
+    mik::motor_group colorMotor;
     mik::piston park_change;
-
+    vex::optical colorSensor;
+    vex::optical topSensor;
 
 };
