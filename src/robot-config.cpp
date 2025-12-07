@@ -10,7 +10,7 @@ vex::competition Competition;
 bool calibrating = false;
 
 // Allows recalibration of the inertial using MINIMUN_INERTIAL_CALIBRATION_ERROR
-bool force_calibrate_inertial = true;
+bool force_calibrate_inertial = false;
 
 // After inertial sensor calibration the program waits 1 second and checks 
 // to see if the angle has changed more than this value. If so, it will recalibrate 
@@ -31,21 +31,22 @@ Chassis chassis(
 		mik::motor(PORT14, false, blue_6_1, "right_back_motor")
     }),
 
-    PORT18, // Inertia sensor port
-    360,    // Inertial scale, value that reads after turning robot a full 360
+    PORT19, // Inertia sensor port
+    359.01,    // Inertial scale, value that reads after turning robot a full 360
 
-    PORT19, // Forward Tracker Port
-    -2,     // Forward Tracker wheel diameter in inches (negative flips direction)
+    PORT3, // Forward Tracker Port
+    2,     // Forward Tracker wheel diameter in inches (negative flips direction)
     0,      // Forward Tracker center distance in inches (a positive distance corresponds to a tracker on the right side of the robot, negative is left)
 
     PORT15,  // Sideways tracker port
     2,       // Sideways tracker wheel diameter in inches (negative flips direction)
-    0.3,     // Sideways tracker center distance in inches (positive distance is behind the center of the robot, negative is in front)
+    0,     // Sideways tracker center distance in inches (positive distance is behind the center of the robot, negative is in front)
 
     mik::distance_reset({
 		// A distance sensor that is mounted on the front of the robot and is offset by 5 inches to the right and 3.5 inches forward from the tracking center 
 		// mik::distance(PORT17, rear_sensor, 5, 3.5)
     })
+	
 );
 
 Assembly assembly(
@@ -56,10 +57,11 @@ Assembly assembly(
 	vex::rotation(PORT1),
 	mik::piston(PORT_C), // goal changing eventually
 	mik::piston(PORT_B), // scraper piston
-	mik::motor_group({mik::motor(PORT11, false, blue_6_1, "left_lift_motor")}),
+	mik::motor_group({mik::motor(PORT11, false, blue_6_1, "colorMotor")}),
 	mik::piston(PORT_A), // park changing piston
 	vex::optical(PORT9),
-	vex::optical(PORT2)
+	vex::optical(PORT2),
+	vex::optical(PORT3)//park sensor
 
 );
 

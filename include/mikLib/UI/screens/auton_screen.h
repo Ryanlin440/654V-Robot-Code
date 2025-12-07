@@ -19,7 +19,7 @@ public:
     void disable_full_override();
     std::string get_state_label();
     bool get_state();
-    int get_cycle_state();
+    int get_cycle_state(); 
 private:
     bool is_btn;
     bool state = false;
@@ -56,6 +56,7 @@ public:
     float auto_start_time = 0;
     int auto_max_time = 15;
     int var_num = 1;
+
 
 private:
     void UI_crt_auton_scr();

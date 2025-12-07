@@ -12,25 +12,39 @@ void odom_mode_constants() {
 }
 
 void test_drive() {
-	chassis.drive_distance(6);
-	chassis.drive_distance(12);
-	chassis.drive_distance(18);
-	chassis.drive_distance(-36);
+	
+	// chassis.drive_distance(2);
+	// chassis.drive_distance(-2);
+	// chassis.drive_distance(1);
+	// chassis.drive_distance(-1);
 }
 
 void test_heading() {
-	chassis.drive_distance(10, { .heading = 15 });
-	chassis.drive_distance(20, { .heading = 45 });
-	chassis.drive_distance(-30, { .heading = 0 });
+	
+	drive_distance_params params;
+	params.heading = 15;
+	chassis.drive_distance(10, params);
+	params.heading = 45;
+	chassis.drive_distance(20, 	params);
+	params.heading = 0;
+	chassis.drive_distance(-30, params);
 }
-
+//
 void test_turn() {
-	chassis.turn_to_angle(5);
-	chassis.turn_to_angle(30);
+	
+	// chassis.turn_to_angle(5);
+	// chassis.turn_to_angle(30);
+
 	chassis.turn_to_angle(90);
-	chassis.turn_to_angle(225);
-	chassis.turn_to_angle(180, { .turn_direction = ccw });
-	chassis.turn_to_angle(0, { .turn_direction = cw });
+	chassis.turn_to_angle(180);
+	chassis.turn_to_angle(90);
+	chassis.turn_to_angle(0);
+	// turn_to_angle_params params;
+	// params.turn_direction = mik::direction::CCW;
+	// chassis.turn_to_angle(180, params );
+	// params.turn_direction = mik::direction::CW;
+	// params.timeout = 1000;
+	// chassis.turn_to_angle(0, params);
 }
 
 void test_swing() {
@@ -42,11 +56,11 @@ void test_full() {
 	default_constants();
 	chassis.set_heading(0);
 
-	chassis.drive_distance(24);
+	chassis.drive_distance(2);
 	chassis.turn_to_angle(-45);
-	chassis.drive_distance(-36);
+	chassis.drive_distance(-3);
 	chassis.right_swing_to_angle(-90);
-	chassis.drive_distance(24);
+	chassis.drive_distance(2);
 	chassis.turn_to_angle(0);
 }
 
@@ -69,8 +83,12 @@ void test_odom_turn() {
 	chassis.turn_to_point(2.887,  5);
 	chassis.turn_to_point(5, 0);
 	chassis.turn_to_point(-5, -5);
-	chassis.turn_to_point(0,  -5, {.turn_direction = ccw});
-	chassis.turn_to_point(0,  5, {.turn_direction = cw});
+	turn_to_point_params params;
+	params.turn_direction = ccw;
+
+	chassis.turn_to_point(0,  -5, params);
+	params.turn_direction = cw;
+	chassis.turn_to_point(0,  5, params);
 }
 
 void test_odom_swing() {
@@ -83,7 +101,9 @@ void test_odom_full() {
 	chassis.set_coordinates(0, 0, 0);
 
 	chassis.drive_to_point(0, 24);
-	chassis.turn_to_point(24, 0, { .angle_offset = 180 });
+	turn_to_point_params params;
+	params.angle_offset = 180;
+	chassis.turn_to_point(24, 0, params);
 	chassis.drive_to_point(24, 0);
 	chassis.right_swing_to_point(0, 0);
 	chassis.drive_to_point(0, 0);
@@ -93,9 +113,11 @@ void test_odom_full() {
 void test_boomerang() {
 	odom_constants();
 	chassis.set_coordinates(0, 0, 0);
-
-	chassis.drive_to_pose(24, 24, 90, {.lead = .4});
-	chassis.drive_to_pose(24, 0, 0, {.lead = .2});
+	drive_to_pose_params params;
+	params.lead = 0.4f;
+	chassis.drive_to_pose(24, 24, 90, params);
+	params.lead = 0.4f;
+	chassis.drive_to_pose(24, 0, 0, params);
 	chassis.drive_to_pose(0, 24, 315);
 	chassis.drive_to_pose(0, 0, 0);
 	}
@@ -129,11 +151,15 @@ std::vector<point> path = {
 void test_pursuit() {
 	odom_constants();
 	chassis.set_coordinates(0, 0, 0);
-
-	chassis.follow_path(path, {.lookahead_distance = 3, .settle_error = 1});
+	follow_path_params params;
+	params.lookahead_distance = 3.0f;
+	params.settle_error = 1.0f;
+	chassis.follow_path(path, params);
 	// Reversing path
 	std::vector<point> reversed_path(path.rbegin(), path.rend());
-	chassis.follow_path(reversed_path, {.lookahead_distance = 4, .settle_error = 3});
+	params.lookahead_distance = 3.0f;
+	params.settle_error = 1.0f;
+	chassis.follow_path(reversed_path, params);
 	chassis.turn_to_angle(0);
 }
 
@@ -191,9 +217,9 @@ void config_tune_drive() {
 		set_point_plot = [](double x){ return hypot(chassis.desired_X_position, chassis.desired_Y_position); };
 	}
 
-	int y_min = -30;
-	int y_max = 50;
-	int time_spent_graphing_ms = 6000; 
+	int y_min = -10;
+	int y_max = 20;
+	int time_spent_graphing_ms = 12000; 
 
 	graph_scr->set_plot_bounds(y_min, y_max, 0, time_spent_graphing_ms, 1, 1);
 	graph_scr->set_plot({actual_plot, set_point_plot}, {{"Actual", 0x002E8B59}, {"SetPoint", 0x00FA8072}});
@@ -278,7 +304,7 @@ void config_tune_turn() {
 
   int y_min = -10;
   int y_max = 370;
-  int time_spent_graphing_ms = 10000; 
+  int time_spent_graphing_ms = 8000; 
 
 	graph_scr->set_plot_bounds(y_min, y_max, 0, time_spent_graphing_ms, 1, 1);
 	graph_scr->set_plot({

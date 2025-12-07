@@ -1,14 +1,9 @@
 #include "vex.h"
 
 using namespace vex;
-bool goalBool = false;
-bool colorOpen = true;
 bool topDetected = false;
-bool otherBall = false;
-// bool is_red_alliance = mik::alliance_is_red;
+bool flapOpen = false;
 
-// const int openAngle = 0; // degrees flap opens
-// const int closeAngle = 90; // flap closed
 // Pass in the devices we want to use
 Assembly::Assembly(
     mik::motor_group lift_arm_motors,
@@ -19,7 +14,8 @@ Assembly::Assembly(
     mik::motor_group colorMotor,
     mik::piston park_change,
     vex::optical colorSensor,
-    vex::optical topSensor
+    vex::optical topSensor,
+    vex::optical parkSensor
 
 ) :
     // Assign the ports to the devices
@@ -31,26 +27,71 @@ Assembly::Assembly(
     colorMotor(colorMotor),
     park_change(park_change), //park for now changing
     colorSensor(colorSensor),
-    topSensor(topSensor)
+    topSensor(topSensor),
+    parkSensor(parkSensor)
 
 {};
 
 // You want to call this function once in the user control function in main.
-void Assembly::init() {//set velocites???????????????????????????????????????????????????????????????????????????????????????????????
+void Assembly::init() {
     // Create the task to move the lift arm. We only want one task to be created
-    park_change.close();// make it go up in beginning
+    park_change.open();// make it go up in beginning
     colorSensor.setLight(ledState::on);
     colorSensor.setLightPower(100, percent);
     topSensor.setLight(ledState::on);
     topSensor.setLightPower(100, percent);
+    parkSensor.setLight(ledState::on);
+    parkSensor.setLightPower(100, percent);
 
+    assembly.scraper_piston.close();
+    assembly.goal_change.open();
     
-    colorMotor.setPosition(0, degrees);
+    colorSort = vex::task([] {
+    while (true) {
+
+        switch (assembly.sortState) {
+
+        case open_flap:
+            assembly.colorMotor.spin(fwd, 12, volt);
+            wait(0.75, seconds);
+            flapOpen = true;
+            break;
+
+        case close_flap:
+            assembly.colorMotor.spin(fwd, -5, volt);
+            wait(0.5, seconds);
+            flapOpen = false;
+            break;
+
+        case slow_reverse:
+            assembly.colorMotor.spin(fwd, -2, volt);
+            wait(0.1, seconds);
+            break;
+
+        case idle:
+        default:
+            assembly.colorMotor.stop(brakeType::hold);
+            break;
+        }
+
+        // Reset after handling an action
+        assembly.sortState = idle;
+
+        wait(20, msec);
+    }
+    return 0;
+});
+
+
 
     lift_task = vex::task([]()
                           {
-        
-        // assembly.move_lift_arm();
+        assembly.colorMotor.spin(fwd, -6, volt);
+        wait(1, seconds);
+        assembly.colorMotor.stop(brakeType::hold);
+        wait(.5, seconds);
+        assembly.colorMotor.resetPosition();
+        flapOpen = false;
         return 0; });
     // To stop the task do `assembly.lift_task.stop();`
 } 
@@ -99,24 +140,11 @@ void Assembly::lift_arm_control() {
 
 // Spins intake forward if L1 is being held, reverse if L2 is being held; stops otherwise
 void Assembly::intake_motors_control() {
-
-    // if(Controller.ButtonY.pressing()){
-    //     intake_motor_front.spin(fwd, 12, volt);
-
-        
-    //     // colorOpen = false;
-    // }else if (Controller.ButtonA.pressing()){
-    //     intake_motor_front.spin(fwd, -12, volt);
-    // }
-    // else
-    // {
-    //     colorOpen = true;
-    // }
     topDetected = topSensor.isNearObject();
 
     if(Controller.ButtonR2.pressing()){
         if(!topDetected){
-            intake_motor_front.spin(fwd, 12, volt);
+            intake_motor_front.spin(fwd, 2, volt);
         }else{
             intake_motor_front.stop();
         }
@@ -138,81 +166,13 @@ void Assembly::intake_motors_control() {
     }
     else if (Controller.ButtonX.pressing())
     {
-        lift_arm_motors.spin(fwd, -2, volt);
-        intake_motor_front.spin(fwd, -2, volt);
-    }
-    else if ((Controller.ButtonY.pressing()))
-    {
-                // colorMotor.spin(reverse, 12, volt);
-
-        
-    }
-    else if ((Controller.ButtonA.pressing()))
-    {
-        // colorMotor.spin(fwd, 12, volt);
+        lift_arm_motors.spin(fwd, -4, volt);
+        intake_motor_front.spin(fwd, -4, volt);
     }else{
         intake_motor_front.stop();
-        // colorMotor.stop(brakeType::hold);
         lift_arm_motors.stop();
         
     }
-
-    // if(btnX_new_press(Controller.ButtonX.pressing())){
-    //     goalBool = !goalBool;
-    // }
-    // if (Controller.ButtonR2.pressing()) {
-    //     // intake_motor_front.spin(fwd, 12, volt);
-    //     if(goalBool){
-    //         intake_motor_front.spin(fwd, 12, volt);
-    //     }
-    //     else{
-    //         intake_motor_front.spin(fwd, 1, volt);
-    //     }
-    //     lift_arm_motors.spin(fwd, 12, volt);
-
-    // } else if (Controller.ButtonR1.pressing()) {
-    //     // intake_motor_front.spin(fwd, -12, volt);
-    //     if(goalBool){
-    //         intake_motor_front.spin(fwd, -12, volt);
-    //     }else{
-    //         intake_motor_front.spin(fwd, -1, volt);
-    //     }
-    //     lift_arm_motors.spin(fwd, -12, volt);
-    // } else if (Controller.ButtonL2.pressing()) {
-    //     lift_arm_motors.spin(fwd, 2, volt);
-    //     intake_motor_front.spin(fwd, 2, volt);
-    // } else if (Controller.ButtonL1.pressing()) {
-    //     lift_arm_motors.spin(fwd, -2, volt);
-    //     intake_motor_front.spin(fwd, -2, volt);
-    // } 
-    // else if (Controller.ButtonY.pressing()) {
-    //     // colorMotor.spinToPosition(10, degrees);// kkkkk try this out
-    //     //colorMotor.spinFor( .5, sec, 12, volt);
-
-
-    //     colorMotor.spin(fwd);
-
-
-
-    //     // colorMotor.spin(fwd,12, volt);
-    //     wait(.5, sec);
-    //     // colorMotor.spin(fwd, 12, volt);
-    // } else if (Controller.ButtonA.pressing()) {
-
-    //     colorMotor.spin(reverse);
-
-    //     // colorMotor.spin(fwd,-12, volt);
-    //     wait(.5, sec);
-    //     // colorMotor.spinToPosition(-10, degrees);
-    //     // colorMotor.spin(fwd, -12, volt);
-    // } 
-    // else {
-    //     intake_motor_front.stop();
-    //     // colorMotor.stop();
-    //     lift_arm_motors.stop();
-        
-
-    // }
     
 }
 
@@ -236,43 +196,89 @@ void Assembly::scraper_piston_control(){// port b
 }
 
 void Assembly::park_change_control(){//port a park for now
-    if(btnLeft_new_press(Controller.ButtonLeft.pressing()) && btnRight_new_press(Controller.ButtonRight.pressing()) ){
+
+    bool objectDetected = parkSensor.isNearObject();
+
+    if(btnLeft_new_press(Controller.ButtonLeft.pressing())){    
+        if(objectDetected){
+            lift_arm_motors.spin(reverse, 4, volt);
+            wait(.5, seconds);
+            lift_arm_motors.stop(coast);
+            park_change.close();
+        }
+        while(!objectDetected){
+            lift_arm_motors.spin(reverse, 4, volt);
+            objectDetected = parkSensor.isNearObject();
+            if(objectDetected){
+                wait(.1, seconds);
+                lift_arm_motors.stop(coast);
+                park_change.close();
+            }
+        }
+        
+        
+    }
+    // }
+    if(btnRight_new_press(Controller.ButtonRight.pressing())){        
         park_change.toggle();
     }
+    
+
 }
-void Assembly::colorCode(){
 
+void Assembly::set_team_color(team_color color){
+    this->color = color;
+}
+
+void Assembly::colorCode() {
     double hue = colorSensor.hue();
-    
     bool objectDetected = colorSensor.isNearObject();
-    if(objectDetected){
-        // intake_motor_front.spin(reverse);
 
-        if(hue >= 160 && hue <= 250){
+    bool isRed  = (hue <= 35 || hue >= 350);
+    bool isBlue = (hue >= 150 && hue <= 250);
 
-        colorMotor.spin(fwd , 12, volt);
-        wait(.2, seconds);
-        colorMotor.spin(fwd, -12, volt);
-        wait(.2, seconds);
-        otherBall = false;
-        }
-        else if (hue >= 0 && hue <= 60 && otherBall == false)
-        {
-            colorMotor.spin(fwd, -12, volt);
-            wait(.1, seconds);
-            otherBall = true;
-        }else if(otherBall){
-            colorMotor.stop(brakeType::hold);
-        }
-    }
-    
-    else{
-        colorMotor.stop(brakeType::hold);
-        otherBall = false;
-        // intake_motor_front.spin(fwd);
-
+    if (!objectDetected) {
+        sortState = idle;
+        return;
     }
 
+    // ---------------- RED TEAM ----------------
+    if (color == team_color::RED) {
 
-    wait(.05, sec);
+        // Blue ball → open flap
+        if (isBlue && !flapOpen) {
+            sortState = open_flap;
+        }
+        // Red ball → close flap
+        else if (isRed && flapOpen) {
+            sortState = close_flap;
+        }
+        // Red ball, flap already closed → slow correction
+        else if (isRed && !flapOpen) {
+            sortState = slow_reverse;
+        }
+        else {
+            sortState = idle;
+        }
+    }
+
+    // ---------------- BLUE TEAM ----------------
+    else if (color == team_color::BLUE) {
+
+        // Red ball → open flap
+        if (isRed && !flapOpen) {
+            sortState = open_flap;
+        }
+        // Blue ball → close flap
+        else if (isBlue && flapOpen) {
+            sortState = close_flap;
+        }
+        // Blue ball, flap closed → slow correction
+        else if (isBlue && !flapOpen) {
+            sortState = slow_reverse;
+        }
+        else {
+            sortState = idle;
+        }
+    }
 }

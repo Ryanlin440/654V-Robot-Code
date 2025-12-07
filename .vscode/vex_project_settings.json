@@ -1,7 +1,7 @@
 {
 	"project": {
 		"name": "mikLib",
-		"slot": 2,
+		"slot": 3,
 		"description": "mikLib-v1.1.1        Press X to hide auton selector",
 		"platform": "V5",
 		"creationDate": "Wed, 15 Oct 2025 01:53:17 GMT",

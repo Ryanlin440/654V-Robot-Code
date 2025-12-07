@@ -41,12 +41,12 @@ void user_control(void) {
     }
 }
 
+
 int main() {
     Competition.autonomous(auton);
     Competition.drivercontrol(user_control);
-
-    pre_auton();
     
+    pre_auton();
     while (true) {
         task::sleep(100);
     }

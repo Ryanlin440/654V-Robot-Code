@@ -2,10 +2,10 @@
 
 #include "v5.h"
 #include "v5_api.h"
+namespace mik
+{
 
-namespace mik {
-
-// Drive Globals
+    // Drive Globals
     /** @brief Enumerates the available driver‑control schemes. */
     enum class drive_mode {
         SPLIT_ARCADE,         // Left stick Y, right stick X
